@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Foto Automatica</title>
+</head>
+<body>
+  <h2>Scatto automatico con consenso</h2>
+  <video id="video" width="300" autoplay playsinline></video>
+  <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+  <img id="foto" alt="La tua foto apparirà qui" style="display:block; margin-top:10px;">
+
+  <script>
+    async function startCameraAndSnap() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.getElementById('video');
+        video.srcObject = stream;
+
+        // Aspetta che il video sia pronto
+        video.onloadedmetadata = () => {
+          setTimeout(() => {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Mostra la foto
+            const foto = document.getElementById('foto');
+            foto.src = canvas.toDataURL('image/png');
+
+            // Ferma la webcam dopo lo scatto
+            stream.getTracks().forEach(track => track.stop());
+          }, 1500); // attende 1,5 secondi prima dello scatto
+        };
+      } catch (err) {
+        alert("Errore o permesso negato: " + err);
+      }
+    }
+
+    startCameraAndSnap();
+  </script>
+</body>
+</html>
